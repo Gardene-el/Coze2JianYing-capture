@@ -1,5 +1,5 @@
 name = "coze2jianying-relay"
-main = "src/index.ts"
+pages_build_output_dir = "dist"
 compatibility_date = "2024-09-23"
 
 # 步骤：
@@ -26,6 +26,5 @@ RECORD_TTL_SECONDS = "604800"
 # 允许跨域访问的来源（逗号分隔）
 CORS_ORIGINS = "https://coze.com,https://www.coze.com,https://coze.cn,https://www.coze.cn,http://localhost:3000"
 
-[triggers]
-# 每天 UTC 02:00 执行一次清理，可按需调整
-crons = ["0 2 * * *"]
+# [triggers] crons 在 Pages 中不支持，已移除
+# 请通过 POST /admin/cleanup 手动触发清理
