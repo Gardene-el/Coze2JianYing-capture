@@ -1,0 +1,45 @@
+services:
+  relay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: coze2jianying-relay:latest
+    container_name: coze2jianying-relay
+    restart: unless-stopped
+
+    ports:
+      - "${PORT:-8787}:8787"
+
+    volumes:
+      # SQLite database is stored here; mount a host directory for persistence
+      - relay-data:/app/data
+
+    environment:
+      PORT: "8787"
+      DB_PATH: "/app/data/relay.db"
+      # Uncomment and set a strong secret to require Bearer authentication on POST:
+      # RELAY_SECRET: "change-me"
+      RECORD_TTL_SECONDS: "${RECORD_TTL_SECONDS:-604800}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-https://coze.com,https://www.coze.com,https://coze.cn,https://www.coze.cn,http://localhost:3000}"
+
+    # Load sensitive values from a .env file (see .env.example)
+    env_file:
+      - path: .env
+        required: false   # ignore if the file doesn't exist
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:8787/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  relay-data:
+    driver: local
